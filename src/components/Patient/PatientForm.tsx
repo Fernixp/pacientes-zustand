@@ -6,10 +6,11 @@ import { usePatientStore } from "../../store/patientStore"
 export default function PatientForm() {
 
     const { addPatient } = usePatientStore()
-    const { register, handleSubmit, formState: { errors } } = useForm<DraftPatient>()
+    const { register, handleSubmit, formState: { errors }, reset } = useForm<DraftPatient>()
     
     const registerPatient = (data: DraftPatient) =>{
         addPatient(data)
+        reset()
     }
     return (
       <div className="md:w-1/2 lg:w-2/5 mx-5">
