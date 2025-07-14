@@ -2,37 +2,55 @@ import { useForm } from "react-hook-form"
 import Error from "../Error"
 import type { DraftPatient } from "../../types"
 import { usePatientStore } from "../../store/patientStore"
+import { useEffect } from "react"
 
 export default function PatientForm() {
 
-    const { addPatient } = usePatientStore()
-    const { register, handleSubmit, formState: { errors }, reset } = useForm<DraftPatient>()
-    
-    const registerPatient = (data: DraftPatient) =>{
+    const { addPatient, activeId, patients, updatePatient } = usePatientStore()
+    const { register, handleSubmit, setValue, formState: { errors }, reset } = useForm<DraftPatient>()
+
+    const registerPatient = (data: DraftPatient) => {
+        if (activeId) {
+            updatePatient(data)
+            reset()
+            return
+        }
         addPatient(data)
         reset()
     }
+
+    useEffect(() => {
+        if (activeId) {
+            const activePatient = patients.find(patient => patient.id === activeId)
+            if (!activePatient) return
+            setValue('name', activePatient.name)
+            setValue('caretaker', activePatient.caretaker)
+            setValue('email', activePatient.email)
+            setValue('date', activePatient.date)
+            setValue('symptoms', activePatient.symptoms)
+        }
+    }, [activeId])
     return (
-      <div className="md:w-1/2 lg:w-2/5 mx-5">
-          <h2 className="font-black text-3xl text-center">Seguimiento Pacientes</h2>
-  
-          <p className="text-lg mt-5 text-center mb-10">
-              Añade Pacientes y {''}
-              <span className="text-indigo-600 font-bold">Administralos</span>
-          </p>
-  
-          <form 
-              className="bg-white shadow-md rounded-lg py-10 px-5 mb-10"
-              noValidate
-              onSubmit={handleSubmit(registerPatient)}
-          >
+        <div className="md:w-1/2 lg:w-2/5 mx-5">
+            <h2 className="font-black text-3xl text-center">Seguimiento Pacientes</h2>
+
+            <p className="text-lg mt-5 text-center mb-10">
+                Añade Pacientes y {''}
+                <span className="text-indigo-600 font-bold">Administralos</span>
+            </p>
+
+            <form
+                className="bg-white shadow-md rounded-lg py-10 px-5 mb-10"
+                noValidate
+                onSubmit={handleSubmit(registerPatient)}
+            >
                 <div className="mb-5">
                     <label htmlFor="name" className="text-sm uppercase font-bold">
-                        Paciente 
+                        Paciente
                     </label>
-                    <input  
+                    <input
                         id="name"
-                        className="w-full p-3  border border-gray-100"  
+                        className="w-full p-3  border border-gray-100"
                         type="text"
                         autoComplete="off"
                         placeholder="Nombre del Paciente"
@@ -50,91 +68,91 @@ export default function PatientForm() {
                     />
                     {errors.name && <Error>{errors.name.message}</Error>}
                 </div>
-  
+
                 <div className="mb-5">
-                  <label htmlFor="caretaker" className="text-sm uppercase font-bold">
-                      Propietario 
-                  </label>
-                  <input  
-                      id="caretaker"
-                      className="w-full p-3  border border-gray-100"  
-                      type="text" 
-                      placeholder="Nombre del Propietario"
-                      {...register('caretaker', {
-                        required: 'El nombre es obligatorio',
-                        minLength: {
-                            value: 3,
-                            message: 'El nombre debe tener al menos 3 caracteres'
-                        },
-                        maxLength: {
-                            value: 20,
-                            message: 'El nombre debe tener menos de 20 caracteres'
-                        }
-                    })} 
-                  />
-                  {errors.caretaker && <Error>{errors.caretaker.message}</Error>}
+                    <label htmlFor="caretaker" className="text-sm uppercase font-bold">
+                        Propietario
+                    </label>
+                    <input
+                        id="caretaker"
+                        className="w-full p-3  border border-gray-100"
+                        type="text"
+                        placeholder="Nombre del Propietario"
+                        {...register('caretaker', {
+                            required: 'El nombre es obligatorio',
+                            minLength: {
+                                value: 3,
+                                message: 'El nombre debe tener al menos 3 caracteres'
+                            },
+                            maxLength: {
+                                value: 20,
+                                message: 'El nombre debe tener menos de 20 caracteres'
+                            }
+                        })}
+                    />
+                    {errors.caretaker && <Error>{errors.caretaker.message}</Error>}
                 </div>
-  
-              <div className="mb-5">
-                <label htmlFor="email" className="text-sm uppercase font-bold">
-                    Email 
-                </label>
-                <input  
-                    id="email"
-                    className="w-full p-3  border border-gray-100"  
-                    type="email" 
-                    placeholder="Email de Registro" 
-                    {...register("email", {
-                        required: "El Email es Obligatorio",
-                        pattern: {
-                          value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                          message: 'Email No Válido'
-                        }
-                      })} 
+
+                <div className="mb-5">
+                    <label htmlFor="email" className="text-sm uppercase font-bold">
+                        Email
+                    </label>
+                    <input
+                        id="email"
+                        className="w-full p-3  border border-gray-100"
+                        type="email"
+                        placeholder="Email de Registro"
+                        {...register("email", {
+                            required: "El Email es Obligatorio",
+                            pattern: {
+                                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                                message: 'Email No Válido'
+                            }
+                        })}
+                    />
+                    {errors.email && <Error>{errors.email.message}</Error>}
+                </div>
+
+                <div className="mb-5">
+                    <label htmlFor="date" className="text-sm uppercase font-bold">
+                        Fecha Alta
+                    </label>
+                    <input
+                        id="date"
+                        className="w-full p-3  border border-gray-100"
+                        type="date"
+                        {...register('date', {
+                            required: 'La fecha es obligatoria',
+                            pattern: {
+                                value: /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/, // YYYY-MM-DD
+                                message: 'La fecha debe ser válida'
+                            }
+                        })}
+                    />
+                    {errors.date && <Error>{errors.date.message}</Error>}
+                </div>
+
+                <div className="mb-5">
+                    <label htmlFor="symptoms" className="text-sm uppercase font-bold">
+                        Síntomas
+                    </label>
+                    <textarea
+                        id="symptoms"
+                        className="w-full p-3  border border-gray-100 field-sizing-content"
+                        placeholder="Síntomas del paciente"
+                        {...register('symptoms', {
+                            required: 'Los síntomas son obligatorios',
+                        })}
+                    ></textarea>
+                    {errors.symptoms && <Error>{errors.symptoms.message}</Error>}
+                </div>
+
+                <input
+                    type="submit"
+                    className="bg-indigo-600 w-full p-3 text-white uppercase font-bold hover:bg-indigo-700 cursor-pointer transition-colors"
+                    value='Guardar Paciente'
                 />
-                {errors.email && <Error>{errors.email.message}</Error>}
-              </div>
-  
-              <div className="mb-5">
-                  <label htmlFor="date" className="text-sm uppercase font-bold">
-                      Fecha Alta 
-                  </label>
-                  <input  
-                      id="date"
-                      className="w-full p-3  border border-gray-100"  
-                      type="date" 
-                      {...register('date', {
-                        required: 'La fecha es obligatoria',
-                        pattern: {
-                            value: /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/, // YYYY-MM-DD
-                            message: 'La fecha debe ser válida'
-                        }
-                    })} 
-                  />
-                  {errors.date && <Error>{errors.date.message}</Error>}
-              </div>
-              
-              <div className="mb-5">
-                  <label htmlFor="symptoms" className="text-sm uppercase font-bold">
-                  Síntomas 
-                  </label>
-                  <textarea  
-                      id="symptoms"
-                      className="w-full p-3  border border-gray-100 field-sizing-content"  
-                      placeholder="Síntomas del paciente" 
-                      {...register('symptoms', {
-                        required: 'Los síntomas son obligatorios',
-                    })} 
-                  ></textarea>
-                  {errors.symptoms && <Error>{errors.symptoms.message}</Error>}
-              </div>
-  
-              <input
-                  type="submit"
-                  className="bg-indigo-600 w-full p-3 text-white uppercase font-bold hover:bg-indigo-700 cursor-pointer transition-colors"
-                  value='Guardar Paciente'
-              />
-          </form> 
-      </div>
+            </form>
+        </div>
     )
-  }
+}
