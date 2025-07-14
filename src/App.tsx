@@ -1,5 +1,5 @@
-import PatientForm from "./components/PatientForm"
-import { PatientList } from "./components/PatientList"
+import PatientForm from "./components/Patient/PatientForm"
+import { PatientList } from "./components/Patient/PatientList"
 
 function App() {
   return (
