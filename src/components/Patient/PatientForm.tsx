@@ -18,7 +18,9 @@ export default function PatientForm() {
             return
         }
         addPatient(data)
-        toast.success("Paciente agregado correctamente")
+        toast.success("Paciente agregado correctamente",{
+            position: "bottom-right",
+        })
         reset()
     }
 

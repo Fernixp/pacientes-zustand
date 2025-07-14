@@ -2,7 +2,6 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import type { DraftPatient, PatientType } from "../types";
 import { v4 as uuidv4 } from "uuid";
-import { toast } from "react-toastify";
 
 type PatientState = {
   patients: PatientType[];
@@ -35,7 +34,6 @@ export const usePatientStore = create<PatientState>()(
       set((state) => ({
         patients: state.patients.filter((patient) => patient.id !== id),
       }));
-      toast.success("Paciente eliminado correctamente")
     },
     setActivePatient(id) {
       set(() => ({
